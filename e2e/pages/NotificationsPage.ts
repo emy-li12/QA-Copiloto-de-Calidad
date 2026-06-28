@@ -18,6 +18,8 @@ export class NotificationsPage {
   async goto() {
     await this.page.goto('/notifications');
     await expect(this.page.getByTestId('notifications-page')).toBeVisible({ timeout: 8000 });
+    // Wait for the loading spinner to disappear and sections to render
+    await expect(this.sectionOverdue).toBeVisible({ timeout: 10000 });
   }
 
   async expectAllSectionsVisible() {
@@ -38,8 +40,10 @@ export class NotificationsPage {
   }
 
   async expectSectionHasTasks(section: NotificationSection) {
-    const count = await this.getSectionCount(section);
-    expect(count).toBeGreaterThan(0);
+    // Use Playwright's auto-retry: wait until a task title (h3) appears in the section
+    await expect(
+      this.page.getByTestId(`section-${section}`).locator('h3').first()
+    ).toBeVisible({ timeout: 10000 });
   }
 
   async expectTaskInSection(section: NotificationSection, title: string) {

@@ -36,6 +36,10 @@ export const DataHelper = {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(data),
     });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`DataHelper.createTask falló ${res.status}: ${text}`);
+    }
     const body = (await res.json()) as { data: { id: string } };
     return body.data.id;
   },
