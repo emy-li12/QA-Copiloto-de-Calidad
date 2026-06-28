@@ -10,6 +10,9 @@ Plataforma de QA inteligente que combina Playwright, TypeScript y agentes de IA 
 
 ```
 QA_Copiloto_de_calidad/
+├── .github/
+│   └── workflows/
+│       └── playwright.yml  # Pipeline CI/CD (Fase 6)
 ├── docs/                   # Base de conocimiento (Fase 2)
 │   ├── domain/             # Reglas de negocio, entidades, flujos
 │   ├── technical/          # Convenciones Playwright, locators, ambientes
@@ -46,7 +49,7 @@ QA_Copiloto_de_calidad/
 | 3 | Plataforma de automatización | ✅ Completado |
 | 4 | Agentes IA | ✅ Completado |
 | 5 | Gestión de datos de prueba | Pendiente |
-| 6 | Pipeline CI/CD | Pendiente |
+| 6 | Pipeline CI/CD | ✅ Completado |
 
 ---
 
@@ -87,6 +90,29 @@ npm run agent:conocimiento -- "se renombró el testid task-create-btn a task-new
 ```
 
 Todos los agentes guardan su reporte en `reports/` con timestamp.
+
+---
+
+### Pipeline CI/CD (Fase 6)
+
+El workflow `.github/workflows/playwright.yml` se activa automáticamente en cada push o PR a `main`, y también puede ser disparado manualmente o desde otro repositorio.
+
+```
+push a main / PR
+        │
+   [warmup]  ← despierta el backend en Render
+        │
+   ┌────┼────┐
+   ▼    ▼    ▼  (paralelo por suite)
+ auth tasks api  notifications
+   └────┴────┘
+        │
+   [summary]  ← ✅ todos pasan / ❌ hay fallos
+```
+
+Para ejecutar manualmente desde GitHub Actions:
+1. Ir a **Actions → QA — Playwright Tests → Run workflow**
+2. Opcionalmente cambiar la URL a testear
 
 ---
 
