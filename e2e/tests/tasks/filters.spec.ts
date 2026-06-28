@@ -1,25 +1,26 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { TasksPage } from '../../pages/TasksPage';
-import { registerTestUser, loginViaAPI, setAuthInBrowser, cleanupTestTasks, createTaskViaAPI } from '../../helpers/auth.helper';
+import { ScenarioBuilder, TestScenario } from '../../data';
+import { DataHelper } from '../../helpers/data.helper';
 
 test.describe('Tasks > Filtros', () => {
-  let token: string;
+  let scenario: TestScenario;
 
   test.beforeAll(async () => {
-    await registerTestUser();
+    scenario = await new ScenarioBuilder()
+      .withUser({ tag: 'filters' })
+      .withTask({ title: 'Tarea pendiente filtro', status: 'pending', priority: 'low' })
+      .withTask({ title: 'Tarea completada filtro', status: 'completed', priority: 'high' })
+      .withTask({ title: 'Tarea en progreso filtro', status: 'in_progress', priority: 'medium' })
+      .build();
+  });
+
+  test.afterAll(async () => {
+    await scenario.cleanup();
   });
 
   test.beforeEach(async ({ page }) => {
-    token = await loginViaAPI();
-    await cleanupTestTasks(token);
-
-    await Promise.all([
-      createTaskViaAPI(token, { title: 'Tarea pendiente filtro', status: 'pending', priority: 'low' }),
-      createTaskViaAPI(token, { title: 'Tarea completada filtro', status: 'completed', priority: 'high' }),
-      createTaskViaAPI(token, { title: 'Tarea en progreso filtro', status: 'in_progress', priority: 'medium' }),
-    ]);
-
-    await setAuthInBrowser(page, token);
+    await DataHelper.injectAuth(page, scenario);
   });
 
   test('filtra tareas por estado pending', async ({ page }) => {

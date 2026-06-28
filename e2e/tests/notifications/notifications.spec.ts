@@ -2,33 +2,33 @@ import { test, expect } from '@playwright/test';
 import { NotificationsPage } from '../../pages/NotificationsPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 import { LoginPage } from '../../pages/LoginPage';
-import { TaskFactory } from '../../data/task.factory';
-import {
-  TEST_USER,
-  registerTestUser,
-  loginViaAPI,
-  setAuthInBrowser,
-  cleanupTestTasks,
-  createTaskViaAPI,
-} from '../../helpers/auth.helper';
+import { TaskFactory } from '../../data';
+import { DataHelper } from '../../helpers/data.helper';
+import type { UserData } from '../../data';
 
 test.describe('Notifications', () => {
   let token: string;
+  let user: UserData;
 
   test.beforeAll(async () => {
-    await registerTestUser();
+    ({ user, token } = await DataHelper.createUser('notif'));
   });
 
   test.beforeEach(async ({ page }) => {
-    token = await loginViaAPI();
-    await cleanupTestTasks(token);
-    await setAuthInBrowser(page, token);
+    await DataHelper.cleanupTasks(token);
+    await page.addInitScript(
+      ({ t, u }) => {
+        localStorage.setItem('emytask_token', t);
+        localStorage.setItem('emytask_user', JSON.stringify(u));
+      },
+      { t: token, u: { name: user.name, email: user.email, id: 'test' } }
+    );
   });
 
   test('es accesible desde el sidebar', async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
-    await loginPage.login(TEST_USER.email, TEST_USER.password);
+    await loginPage.login(user.email, user.password);
 
     const dashboardPage = new DashboardPage(page);
     await dashboardPage.navigateToNotifications();
@@ -57,7 +57,7 @@ test.describe('Notifications', () => {
 
   test('tarea completada aparece en la sección completed', async ({ page }) => {
     const task = TaskFactory.completed();
-    await createTaskViaAPI(token, task);
+    await DataHelper.createTask(token, task);
 
     const notifPage = new NotificationsPage(page);
     await notifPage.goto();
@@ -67,7 +67,7 @@ test.describe('Notifications', () => {
 
   test('tarea vencida aparece en la sección overdue', async ({ page }) => {
     const task = TaskFactory.overdue();
-    await createTaskViaAPI(token, task);
+    await DataHelper.createTask(token, task);
 
     const notifPage = new NotificationsPage(page);
     await notifPage.goto();
@@ -77,7 +77,7 @@ test.describe('Notifications', () => {
 
   test('tarea con dueDate hoy aparece en sección today', async ({ page }) => {
     const task = TaskFactory.dueToday();
-    await createTaskViaAPI(token, task);
+    await DataHelper.createTask(token, task);
 
     const notifPage = new NotificationsPage(page);
     await notifPage.goto();

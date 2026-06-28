@@ -61,7 +61,7 @@ test.describe('Tasks > Crear tarea', () => {
 
     await tasksPage.expectTaskCard(task.title);
     const card = tasksPage.getCard(task.title);
-    await expect(card.locator('text=En progreso')).toBeVisible();
+    await expect(card.getByText('En progreso', { exact: true })).toBeVisible();
     await expect(card.locator('text=Alta')).toBeVisible();
   });
 

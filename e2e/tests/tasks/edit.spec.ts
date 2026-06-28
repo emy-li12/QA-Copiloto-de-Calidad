@@ -54,7 +54,7 @@ test.describe('Tasks > Editar tarea', () => {
     await expect(page.getByTestId('task-form-modal')).not.toBeVisible({ timeout: 5000 });
 
     const card = tasksPage.getCard(task.title);
-    await expect(card.locator('text=Completada')).toBeVisible({ timeout: 5000 });
+    await expect(card.getByText('Completada', { exact: true })).toBeVisible({ timeout: 5000 });
   });
 
   test('actualiza la prioridad de la tarea', async ({ page }) => {

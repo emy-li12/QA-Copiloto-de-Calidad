@@ -27,7 +27,7 @@ export class NotificationsPage {
   }
 
   async getSectionCount(section: NotificationSection): Promise<number> {
-    const badge = this.page.getByTestId(`section-${section}`).locator('span').last();
+    const badge = this.page.getByTestId(`section-${section}`).locator('span').first();
     const text = await badge.textContent();
     return parseInt(text ?? '0', 10);
   }
@@ -49,6 +49,6 @@ export class NotificationsPage {
   }
 
   async expectPageTitle() {
-    await expect(this.page.getByText('Notificaciones')).toBeVisible();
+    await expect(this.page.getByRole('heading', { name: 'Notificaciones' })).toBeVisible();
   }
 }
