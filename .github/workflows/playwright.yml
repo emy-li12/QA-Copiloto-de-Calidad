@@ -1,0 +1,107 @@
+name: QA — Playwright Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Frontend URL a testear'
+        required: false
+        default: 'https://emy-task-frontend.vercel.app'
+      api_url:
+        description: 'Backend API URL'
+        required: false
+        default: 'https://emytask-backend.onrender.com'
+  repository_dispatch:
+    types: [run-qa-tests]
+
+env:
+  BASE_URL: ${{ github.event.inputs.base_url || github.event.client_payload.base_url || 'https://emy-task-frontend.vercel.app' }}
+  API_URL: ${{ github.event.inputs.api_url || github.event.client_payload.api_url || 'https://emytask-backend.onrender.com' }}
+
+jobs:
+  warmup:
+    name: Wake up backend (Render)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping until backend responde
+        run: |
+          echo "Despertando backend en $API_URL ..."
+          for i in $(seq 1 8); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$API_URL" || echo "000")
+            echo "Intento $i: HTTP $STATUS"
+            if [ "$STATUS" != "000" ]; then
+              echo "Backend listo."
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "Backend no respondio a tiempo."
+          exit 1
+
+  test:
+    name: Playwright — ${{ matrix.suite }}
+    needs: warmup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [auth, tasks, notifications, api]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar browsers Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: Correr tests — ${{ matrix.suite }}
+        run: npx playwright test e2e/tests/${{ matrix.suite }}/
+        env:
+          BASE_URL: ${{ env.BASE_URL }}
+          API_URL: ${{ env.API_URL }}
+          CI: true
+
+      - name: Subir reporte HTML
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-${{ matrix.suite }}-${{ github.run_id }}
+          path: reports/html/
+          retention-days: 30
+
+      - name: Subir traces y screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: traces-${{ matrix.suite }}-${{ github.run_id }}
+          path: test-results/
+          retention-days: 7
+
+  summary:
+    name: Resumen de resultados
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Estado final
+        run: |
+          if [ "${{ needs.test.result }}" = "success" ]; then
+            echo "✅ Todos los tests pasaron. Deploy autorizado."
+          else
+            echo "❌ Hay tests fallidos. Revisar reportes antes de desplegar."
+            exit 1
+          fi
