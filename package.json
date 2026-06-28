@@ -1,0 +1,32 @@
+{
+  "name": "qa-copiloto-de-calidad",
+  "version": "1.0.0",
+  "description": "Plataforma de QA inteligente con IA y Playwright — EmyTask como sistema bajo prueba",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:auth": "playwright test e2e/tests/auth/",
+    "test:tasks": "playwright test e2e/tests/tasks/",
+    "test:notifications": "playwright test e2e/tests/notifications/",
+    "test:api": "playwright test e2e/tests/api/",
+    "test:report": "playwright show-report",
+    "type-check": "tsc --noEmit",
+    "agent:analista": "tsx agents/analista/index.ts",
+    "agent:generador": "tsx agents/generador/index.ts",
+    "agent:diagnostico": "tsx agents/diagnostico/index.ts",
+    "agent:mantenimiento": "tsx agents/mantenimiento/index.ts",
+    "agent:cobertura": "tsx agents/cobertura/index.ts",
+    "agent:conocimiento": "tsx agents/conocimiento/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.106.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^26.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.4.5"
+  }
+}

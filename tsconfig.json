@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "paths": {
+      "@pages/*": ["./e2e/pages/*"],
+      "@helpers/*": ["./e2e/helpers/*"],
+      "@fixtures/*": ["./e2e/fixtures/*"],
+      "@data/*": ["./e2e/data/*"]
+    }
+  },
+  "include": ["e2e/**/*", "agents/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+
