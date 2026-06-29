@@ -14,10 +14,7 @@
     "type-check": "tsc --noEmit",
     "agent:agente1-analista": "tsx agents/agente1-analista/index.ts",
     "agent:agente2-programador": "tsx agents/agente2-programador/index.ts",
-    "agent:agente3-diagnostico": "tsx agents/agente3-diagnostico/index.ts",
-    "agent:agente4-mantenimiento": "tsx agents/agente4-mantenimiento/index.ts",
-    "agent:agente5-cobertura": "tsx agents/agente5-cobertura/index.ts",
-    "agent:agente6-conocimiento": "tsx agents/agente6-conocimiento/index.ts"
+    "agent:agente3-diagnostico": "tsx agents/agente3-diagnostico/index.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",
