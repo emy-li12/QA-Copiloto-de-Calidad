@@ -1,4 +1,4 @@
-import {
+﻿import {
   readSystemPrompt,
   readProjectFile,
   readProjectFileOrNull,
@@ -10,7 +10,7 @@ import {
 async function main() {
   console.log("Agente Cobertura iniciando...\n");
 
-  const systemPrompt = readSystemPrompt("cobertura");
+  const systemPrompt = readSystemPrompt("agente5");
 
   const specFiles = listSpecFiles("e2e/tests");
   console.log(`  Analizando ${specFiles.length} archivos de tests...`);
@@ -61,3 +61,4 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+

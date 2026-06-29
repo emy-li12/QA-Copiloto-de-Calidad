@@ -1,4 +1,4 @@
-import * as path from "path";
+﻿import * as path from "path";
 import {
   readSystemPrompt,
   readProjectFile,
@@ -23,7 +23,7 @@ async function main() {
   console.log("Agente Mantenimiento iniciando...");
   console.log(`  Archivo: ${targetFile}\n`);
 
-  const systemPrompt = readSystemPrompt("mantenimiento");
+  const systemPrompt = readSystemPrompt("agente4");
 
   const fileContent = readProjectFileOrNull(targetFile);
   if (!fileContent) {
@@ -70,3 +70,4 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+

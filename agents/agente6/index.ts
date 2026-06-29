@@ -1,4 +1,4 @@
-import {
+﻿import {
   readSystemPrompt,
   readProjectFile,
   askClaude,
@@ -21,7 +21,7 @@ async function main() {
   console.log("Agente Conocimiento iniciando...");
   console.log(`  Cambio: ${changeDescription}\n`);
 
-  const systemPrompt = readSystemPrompt("conocimiento");
+  const systemPrompt = readSystemPrompt("agente6");
 
   const flows = readProjectFile("docs/domain/flows.md");
   const entities = readProjectFile("docs/domain/entities.md");
@@ -69,3 +69,4 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
