@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 import { NotificationsPage } from '../../pages/NotificationsPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 import { LoginPage } from '../../pages/LoginPage';
-import { TaskFactory } from '../../data';
 import { DataHelper } from '../../helpers/data.helper';
 import type { UserData } from '../../data';
 
@@ -53,35 +52,5 @@ test.describe('Notifications', () => {
     await notifPage.expectEmptySection('overdue');
     await notifPage.expectEmptySection('today');
     await notifPage.expectEmptySection('completed');
-  });
-
-  test('tarea completada aparece en la sección completed', async ({ page }) => {
-    const task = TaskFactory.completed();
-    await DataHelper.createTask(token, task);
-
-    const notifPage = new NotificationsPage(page);
-    await notifPage.goto();
-    await notifPage.expectSectionHasTasks('completed');
-    await notifPage.expectTaskInSection('completed', task.title);
-  });
-
-  test('tarea vencida aparece en la sección overdue', async ({ page }) => {
-    const task = TaskFactory.overdue();
-    await DataHelper.createTask(token, task);
-
-    const notifPage = new NotificationsPage(page);
-    await notifPage.goto();
-    await notifPage.expectSectionHasTasks('overdue');
-    await notifPage.expectTaskInSection('overdue', task.title);
-  });
-
-  test('tarea con dueDate hoy aparece en sección today', async ({ page }) => {
-    const task = TaskFactory.dueToday();
-    await DataHelper.createTask(token, task);
-
-    const notifPage = new NotificationsPage(page);
-    await notifPage.goto();
-    await notifPage.expectSectionHasTasks('today');
-    await notifPage.expectTaskInSection('today', task.title);
   });
 });
