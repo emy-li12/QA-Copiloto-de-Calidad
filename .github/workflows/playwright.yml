@@ -23,11 +23,14 @@ env:
   API_URL: ${{ github.event.inputs.api_url || github.event.client_payload.api_url || 'https://emytask-backend.onrender.com' }}
 
 jobs:
+  # ─────────────────────────────────────────────
+  # Job 1: Despertar backend en Render
+  # ─────────────────────────────────────────────
   warmup:
     name: Wake up backend (Render)
     runs-on: ubuntu-latest
     steps:
-      - name: Ping until backend responde
+      - name: Ping hasta que el backend responda
         run: |
           echo "Despertando backend en $API_URL ..."
           for i in $(seq 1 8); do
@@ -42,9 +45,37 @@ jobs:
           echo "Backend no respondio a tiempo."
           exit 1
 
+  # ─────────────────────────────────────────────
+  # Job 2: Construir imagen Docker con Node 22
+  # y todos los browsers de Playwright.
+  # El resultado se guarda en caché de GHA para
+  # que los jobs de test la restauren rápido.
+  # ─────────────────────────────────────────────
+  build-image:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Construir imagen y guardar en caché
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: qa-playwright:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─────────────────────────────────────────────
+  # Job 3 (matrix): Correr cada suite dentro del
+  # contenedor Docker.
+  # ─────────────────────────────────────────────
   test:
     name: Playwright — ${{ matrix.suite }}
-    needs: warmup
+    needs: [warmup, build-image]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -53,27 +84,32 @@ jobs:
         suite: [auth, tasks, notifications, api]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Restaurar imagen desde caché
+        uses: docker/build-push-action@v5
         with:
-          node-version: '20'
-          cache: 'npm'
+          context: .
+          load: true
+          tags: qa-playwright:latest
+          cache-from: type=gha
 
-      - name: Instalar dependencias
-        run: npm ci
-
-      - name: Instalar browsers Playwright
-        run: npx playwright install --with-deps chromium
+      - name: Crear directorios de salida en el runner
+        run: mkdir -p reports/html test-results
 
       - name: Correr tests — ${{ matrix.suite }}
-        run: npx playwright test e2e/tests/${{ matrix.suite }}/
-        env:
-          BASE_URL: ${{ env.BASE_URL }}
-          API_URL: ${{ env.API_URL }}
-          CI: true
+        run: |
+          docker run --rm \
+            -e BASE_URL="${{ env.BASE_URL }}" \
+            -e API_URL="${{ env.API_URL }}" \
+            -e CI=true \
+            -v "${{ github.workspace }}/reports:/app/reports" \
+            -v "${{ github.workspace }}/test-results:/app/test-results" \
+            qa-playwright \
+            npx playwright test e2e/tests/${{ matrix.suite }}/
 
       - name: Subir reporte HTML
         uses: actions/upload-artifact@v4
@@ -91,6 +127,9 @@ jobs:
           path: test-results/
           retention-days: 7
 
+  # ─────────────────────────────────────────────
+  # Job 4: Resumen final
+  # ─────────────────────────────────────────────
   summary:
     name: Resumen de resultados
     needs: test
@@ -100,7 +139,7 @@ jobs:
       - name: Estado final
         run: |
           if [ "${{ needs.test.result }}" = "success" ]; then
-            echo "✅ Todos los tests pasaron. Deploy autorizado."
+            echo "✅ Todos los tests pasaron."
           else
             echo "❌ Hay tests fallidos. Revisar reportes antes de desplegar."
             exit 1
