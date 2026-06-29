@@ -10,7 +10,7 @@
 async function main() {
   console.log("Agente Cobertura iniciando...\n");
 
-  const systemPrompt = readSystemPrompt("agente5");
+  const systemPrompt = readSystemPrompt("agente5-cobertura");
 
   const specFiles = listSpecFiles("e2e/tests");
   console.log(`  Analizando ${specFiles.length} archivos de tests...`);
@@ -61,4 +61,5 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
 

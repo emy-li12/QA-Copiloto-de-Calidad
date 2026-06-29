@@ -21,7 +21,7 @@ async function main() {
   console.log("Agente Conocimiento iniciando...");
   console.log(`  Cambio: ${changeDescription}\n`);
 
-  const systemPrompt = readSystemPrompt("agente6");
+  const systemPrompt = readSystemPrompt("agente6-conocimiento");
 
   const flows = readProjectFile("docs/domain/flows.md");
   const entities = readProjectFile("docs/domain/entities.md");
@@ -69,4 +69,5 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
 

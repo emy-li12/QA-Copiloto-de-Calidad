@@ -23,7 +23,7 @@ async function main() {
   console.log("Agente Mantenimiento iniciando...");
   console.log(`  Archivo: ${targetFile}\n`);
 
-  const systemPrompt = readSystemPrompt("agente4");
+  const systemPrompt = readSystemPrompt("agente4-mantenimiento");
 
   const fileContent = readProjectFileOrNull(targetFile);
   if (!fileContent) {
@@ -70,4 +70,5 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
 

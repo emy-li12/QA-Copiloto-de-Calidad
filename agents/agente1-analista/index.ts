@@ -8,7 +8,7 @@
 async function main() {
   console.log("Agente Analista iniciando...\n");
 
-  const systemPrompt = readSystemPrompt("agente1");
+  const systemPrompt = readSystemPrompt("agente1-analista");
   const resultsJson = readProjectFileOrNull("reports/results.json");
 
   let userMessage: string;
@@ -49,4 +49,5 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
 

@@ -12,12 +12,12 @@
     "test:api": "playwright test e2e/tests/api/",
     "test:report": "playwright show-report",
     "type-check": "tsc --noEmit",
-    "agent:agente1": "tsx agents/agente1/index.ts",
-    "agent:agente2": "tsx agents/agente2/index.ts",
-    "agent:agente3": "tsx agents/agente3/index.ts",
-    "agent:agente4": "tsx agents/agente4/index.ts",
-    "agent:agente5": "tsx agents/agente5/index.ts",
-    "agent:agente6": "tsx agents/agente6/index.ts"
+    "agent:agente1-analista": "tsx agents/agente1-analista/index.ts",
+    "agent:agente2-generador": "tsx agents/agente2-generador/index.ts",
+    "agent:agente3-diagnostico": "tsx agents/agente3-diagnostico/index.ts",
+    "agent:agente4-mantenimiento": "tsx agents/agente4-mantenimiento/index.ts",
+    "agent:agente5-cobertura": "tsx agents/agente5-cobertura/index.ts",
+    "agent:agente6-conocimiento": "tsx agents/agente6-conocimiento/index.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.106.0",

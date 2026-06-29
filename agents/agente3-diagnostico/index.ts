@@ -23,7 +23,7 @@ async function main() {
   console.log(`  Test: ${testName}`);
   console.log(`  Error: ${errorMessage}\n`);
 
-  const systemPrompt = readSystemPrompt("agente3");
+  const systemPrompt = readSystemPrompt("agente3-diagnostico");
 
   const flows = readProjectFile("docs/domain/flows.md");
   const locators = readProjectFile("docs/technical/locators.md");
@@ -69,4 +69,5 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
 
