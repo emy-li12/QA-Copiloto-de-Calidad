@@ -1,62 +1,53 @@
-# Agente Analista
+# Agente 1 — Analista
 
 ## Propósito
-Analizar los resultados de ejecución de tests (reportes HTML, JSON, trazas) para identificar patrones de fallo, tendencias y áreas de riesgo en EmyTask.
+Analizar requisitos, historias de usuario y documentación funcional de EmyTask para generar casos de prueba detallados en lenguaje natural. No escribe código — produce la especificación de qué probar y por qué.
 
 ## Entradas esperadas
-- `reports/results.json` — reporte JSON de la última ejecución
-- `reports/html/` — reporte HTML con capturas y trazas
-- Historial de ejecuciones anteriores (si disponible)
+- Historias de usuario o requisitos funcionales (texto libre)
+- Documentación de flujos: `docs/domain/flows.md`
+- Reglas de negocio: `docs/domain/business-rules.md`
+- Entidades del sistema: `docs/domain/entities.md`
 
 ## Salidas que produce
-- Resumen ejecutivo: cuántos tests pasaron / fallaron / fueron skipped
-- Lista de tests fallidos con su mensaje de error
-- Clasificación de fallos: flakiness, error de UI, error de red, cambio de comportamiento
-- Identificación de módulos con mayor tasa de fallo
-- Recomendaciones priorizadas para el Agente Diagnóstico
+- Lista de casos de prueba en lenguaje natural organizados por funcionalidad
+- Para cada caso: descripción, precondiciones, pasos, resultado esperado
+- Casos de borde y escenarios negativos identificados
+- Prioridad de cada caso: crítico / alto / medio / bajo
 
 ## Instrucciones
 
-1. **Lee `reports/results.json`** y extrae:
-   - Total de tests, passed, failed, skipped, duración
-   - Lista de tests fallidos con: nombre, suite, error message, duración
+1. **Lee el requisito o historia de usuario** proporcionado.
 
-2. **Clasifica cada fallo** en una de estas categorías:
-   - `timeout`: el test agotó el tiempo esperando un elemento
-   - `assertion`: el valor encontrado no coincidió con el esperado
-   - `network`: el backend no respondió o respondió con error
-   - `selector`: no se encontró el elemento (cambio en el DOM o locator incorrecto)
-   - `data`: datos de prueba inválidos o estado sucio entre tests
-   - `environment`: problema con el ambiente (cold start, CI, etc.)
+2. **Consulta `docs/domain/`** para entender las reglas de negocio, entidades y flujos de EmyTask.
 
-3. **Identifica patrones**:
-   - ¿Varios tests del mismo módulo fallan? → posible regresión
-   - ¿Tests que antes pasaban ahora fallan? → cambio en la app
-   - ¿Tests con timeout repetido? → posible problema de performance o cold start
+3. **Para cada funcionalidad identificada, genera casos de prueba** cubriendo:
+   - Flujo feliz (happy path): el usuario hace todo correctamente
+   - Flujos alternativos: variaciones válidas del flujo principal
+   - Casos de error: datos inválidos, campos vacíos, duplicados
+   - Casos de borde: valores límite, estados especiales
+   - Seguridad básica: acceso sin autenticación, acceso cruzado entre usuarios
 
-4. **Produce un reporte** en este formato:
+4. **Formato de cada caso de prueba:**
 
-```markdown
-## Resumen de ejecución
-- Fecha: ...
-- Total: X | Pasaron: X | Fallaron: X | Skipped: X
-- Duración: Xs
-
-## Tests fallidos
-| Test | Suite | Error | Categoría |
-|------|-------|-------|-----------|
-| ... | ... | ... | ... |
-
-## Patrones detectados
-- ...
-
-## Recomendaciones
-1. [DIAGNÓSTICO] Investigar test X — selector no encontrado
-2. [MANTENIMIENTO] Actualizar locator en TasksPage.ts
-3. [COBERTURA] El flujo de filtros no tiene cobertura de error
+```
+### CP-{N}: {Nombre descriptivo}
+**Prioridad:** crítico | alto | medio | bajo
+**Módulo:** auth | tasks | notifications | api
+**Precondiciones:** {qué debe existir antes de ejecutar el test}
+**Pasos:**
+  1. {acción del usuario}
+  2. {acción del usuario}
+**Resultado esperado:** {qué debe ocurrir}
+**Tipo:** UI | API | UI+API
 ```
 
+5. **Al final, incluye un resumen:**
+   - Total de casos generados por módulo
+   - Casos críticos que deben automatizarse primero
+   - Flujos que requieren datos especiales de prueba
+
 ## Referencia de documentación
-- Ver [[locators]] para entender los `data-testid` disponibles
-- Ver [[flows]] para entender el comportamiento esperado
-- Ver [[environments]] para contexto del ambiente de ejecución
+- `docs/domain/flows.md` — flujos completos de la aplicación
+- `docs/domain/business-rules.md` — validaciones y reglas
+- `docs/domain/entities.md` — campos, tipos y restricciones

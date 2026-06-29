@@ -13,7 +13,7 @@
     "test:report": "playwright show-report",
     "type-check": "tsc --noEmit",
     "agent:agente1-analista": "tsx agents/agente1-analista/index.ts",
-    "agent:agente2-generador": "tsx agents/agente2-generador/index.ts",
+    "agent:agente2-programador": "tsx agents/agente2-programador/index.ts",
     "agent:agente3-diagnostico": "tsx agents/agente3-diagnostico/index.ts",
     "agent:agente4-mantenimiento": "tsx agents/agente4-mantenimiento/index.ts",
     "agent:agente5-cobertura": "tsx agents/agente5-cobertura/index.ts",

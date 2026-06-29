@@ -23,7 +23,7 @@ async function main() {
   console.log(`  Flujo: ${featureDescription}`);
   console.log(`  Modulo: ${targetModule}\n`);
 
-  const systemPrompt = readSystemPrompt("agente2-generador");
+  const systemPrompt = readSystemPrompt("agente2-programador");
 
   const flows = readProjectFile("docs/domain/flows.md");
   const locators = readProjectFile("docs/technical/locators.md");
@@ -71,5 +71,6 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
+
 
 
