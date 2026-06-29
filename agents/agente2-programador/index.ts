@@ -64,7 +64,7 @@ Si se requiere un Page Object nuevo, incluyelo tambien.`;
     .slice(0, 40)
     .replace(/-$/, "");
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-  writeReport(`generador-${safeName}-${timestamp}.md`, spec);
+  writeReport(`programador-${safeName}-${timestamp}.md`, spec);
 }
 
 main().catch((err) => {

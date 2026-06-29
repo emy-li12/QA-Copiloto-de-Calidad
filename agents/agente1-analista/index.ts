@@ -1,42 +1,67 @@
-﻿import {
+import {
   readSystemPrompt,
+  readProjectFile,
   readProjectFileOrNull,
   askClaude,
   writeReport,
 } from "../core/runner";
 
 async function main() {
+  const requirementsArg = process.argv[2];
+
+  if (!requirementsArg) {
+    console.error(
+      'Uso: npm run agent:agente1-analista -- "<historia de usuario o requerimiento>"'
+    );
+    console.error(
+      'Ejemplo: npm run agent:agente1-analista -- "Como usuario quiero crear una tarea con fecha de vencimiento"'
+    );
+    console.error(
+      "Alternativa: crea un archivo requirements.md en la raiz y ejecuta sin argumentos"
+    );
+
+    const requirementsFile = readProjectFileOrNull("requirements.md");
+    if (!requirementsFile) {
+      process.exit(1);
+    }
+
+    console.log("Leyendo requirements.md...\n");
+    await runAnalysis(requirementsFile);
+    return;
+  }
+
+  await runAnalysis(requirementsArg);
+}
+
+async function runAnalysis(requirements: string) {
   console.log("Agente Analista iniciando...\n");
 
   const systemPrompt = readSystemPrompt("agente1-analista");
-  const resultsJson = readProjectFileOrNull("reports/results.json");
 
-  let userMessage: string;
+  const flows = readProjectFile("docs/domain/flows.md");
+  const businessRules = readProjectFile("docs/domain/business-rules.md");
+  const entities = readProjectFile("docs/domain/entities.md");
 
-  if (!resultsJson) {
-    console.warn(
-      "AVISO: No se encontro reports/results.json. Ejecuta los tests primero: npm test"
-    );
-    console.warn("Generando reporte de ejemplo con datos simulados...\n");
+  const userMessage = `Analiza el siguiente requerimiento o historia de usuario y genera los casos de prueba en lenguaje natural:
 
-    userMessage = `No hay un archivo reports/results.json disponible todavia.
+## Requerimiento / Historia de usuario
+${requirements}
 
-Genera un reporte de ejemplo que demuestre el formato esperado, usando datos ficticios
-de una ejecucion hipotetica de la suite de EmyTask (auth, tasks, notifications, api).
-Simula que hay algunos tests fallidos con diferentes categorias para mostrar el analisis
-completo. Explica tambien como interpretar el resultado.`;
-  } else {
-    userMessage = `Analiza el siguiente reporte de ejecucion de Playwright y produce el informe completo:
+## Flujos documentados de EmyTask
+${flows}
 
-\`\`\`json
-${resultsJson}
-\`\`\`
+## Reglas de negocio
+${businessRules}
 
-Clasifica cada fallo, identifica patrones y da recomendaciones priorizadas.`;
-  }
+## Entidades del sistema
+${entities}
+
+Genera todos los casos de prueba cubriendo: flujo feliz, flujos alternativos, casos de error, casos de borde y seguridad básica.
+Usa el formato CP-{N} con prioridad, módulo, precondiciones, pasos y resultado esperado.
+Al final incluye el resumen con totales por módulo y casos críticos a automatizar primero.`;
 
   console.log("Consultando Claude...\n");
-  const report = await askClaude(systemPrompt, userMessage);
+  const report = await askClaude(systemPrompt, userMessage, 12000);
 
   console.log("=".repeat(60));
   console.log(report);
@@ -49,5 +74,3 @@ main().catch((err) => {
   console.error("Error:", err.message);
   process.exit(1);
 });
-
-
